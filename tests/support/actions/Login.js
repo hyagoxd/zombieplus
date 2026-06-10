@@ -6,16 +6,17 @@ export class Login {
         this.page = page;
     }
 
-    async do(email, password) {
-        this.visit();
-        this.submit(email, password);
-        this.isLoggedIn();
+    async do(email, password, username) {
+        await this.visit();
+        await this.submit(email, password);
+        // CORREÇÃO: Passando a variável username diretamente (sem aspas)
+        await this.isLoggedIn(username);
     }
 
     async visit() {
         await this.page.goto('http://localhost:3000/admin/login');
 
-        const loginform = this.page.locator('.login-form')
+        const loginform = this.page.locator('.login-form');
         await expect(loginform).toBeVisible();
     }
 
@@ -25,17 +26,13 @@ export class Login {
         await this.page.getByText('Entrar').click();
     }
 
-
-
     async alertHaveText(text) {
         const alert = this.page.locator('span[class$=alert]');
         await expect(alert).toHaveText(text);
     }
 
-        async isLoggedIn() {
-        await this.page.waitForLoadState('networkidle'); // Espera a página carregar completamente
-        await expect(this.page).toHaveURL(/.*admin/)
+    async isLoggedIn(username) {
+        const loggedUser = this.page.locator('.logged-user');
+        await expect(loggedUser).toHaveText(`Olá, ${username}`);
     }
-
 }
-
